@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 const QuestionModel = require("./questions");
-require("./comments")
+require("./comments");
 
 const schema = new mongoose.Schema({
   title: String,
-  videos: String,
-  quiz: [QuestionModel.schema],
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+  videos: [String],
+  course_id: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
 });
 
 const Lesson = mongoose.model("Lesson", schema);
