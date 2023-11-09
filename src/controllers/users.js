@@ -1,6 +1,7 @@
 const userModel = require("../models/users");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { use } = require("passport");
 
 exports.register = async (req, res) => {
   try {
@@ -94,6 +95,18 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const user = await userModel.User.findByIdAndDelete(req.params.id);
+    return res.json(user);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};
+
+exports.enrollInCourse = async (req, res) => {
+  try {
+    const user = await userModel.User.findById(req.params.id);
+    if (!user.courses_taken.includes(req.body)) {
+      user.courses_taken.push(req.body);
+    }
     return res.json(user);
   } catch (err) {
     res.status(500).send(err.message);
