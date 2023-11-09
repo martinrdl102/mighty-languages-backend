@@ -29,7 +29,9 @@ exports.getLessonsFromCourseId = async (req, res) => {
 
 exports.getLesson = async (req, res) => {
   try {
-    const lesson = await lessonModel.Lesson.findById(req.params.id);
+    const lesson = await lessonModel.Lesson.findById(req.params.id).populate(
+      "course_id"
+    );
     return res.json(lesson);
   } catch (err) {
     res.status(500).send(err.message);

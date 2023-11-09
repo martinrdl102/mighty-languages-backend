@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const QuestionModel = require("./questions");
-require("./comments");
 
 const schema = new mongoose.Schema({
   title: String,
