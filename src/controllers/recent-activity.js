@@ -1,39 +1,40 @@
 const recentActivityModel = require("../models/recent-activity");
 
-exports.addRating = async (req, res) => {
-  const newRating = new ratingModel.Rating({
-    user_id: req.body.user_id,
+exports.addRecentActivity = async (req, res) => {
+  const newRecentActivity = new recentActivityModel.RecentActivity({
     course_id: req.body.course_id,
-    rating: req.body.rating,
+    user_id: req.body.user_id,
+    currentLessonIndex: req.body.currentLessonIndex,
+    dateLastActivity:new Date(),
   });
   try {
-    const createdRating = await newRating.save();
-    return res.json(createdRating);
+    const createdRecentActivity = await newRecentActivity.save();
+    return res.json(createdRecentActivity);
   } catch (e) {
     console.log(e.message);
-    return res.send("Rating not created");
+    return res.send("Recent Activity not created")
   }
 };
 
-exports.editRating = async (req, res) => {
-  try {
-    const rating = await ratingModel.Rating.findOneAndUpdate(
-      {
-        user_id: req.query.userId,
-        course_id: req.query.courseId,
-      },
-      { $set: req.body }, //{rating}
-      { new: true }
-    );
-    return res.json(rating);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-};
+exports.editRecentActivity= async (req, res) => {
+    try {
+      const recentActivity = await recentActivityModel.RecentActivity.findOneAndUpdate(
+        {
+          user_id: req.query.userId,
+          course_id: req.query.courseId,
+        },
+        { $set: req.body }, //{rating}
+        { new: true }
+      );
+      return res.json(recentActivity);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  };
 
-exports.deleteRating = async (req, res) => {
+exports.deleteRecentActivity = async (req, res) => {
   try {
-    await ratingModel.Rating.deleteOne({
+    await recentActivityModel.RecentActivity.deleteOne({
       user_id: req.query.userId,
       course_id: req.query.courseId,
     });
