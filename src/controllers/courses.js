@@ -103,8 +103,9 @@ exports.updateCourse = async (req, res) => {
       { $set: req.body },
       { new: true }
     );
+    console.log(course.user)
     const userRating = await Rating.findOne({
-      user_id: course.user._id,
+      user_id: req.query.user,
       course_id: course._id,
     });
     const courseRating = await Rating.find({
