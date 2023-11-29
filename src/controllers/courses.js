@@ -2,6 +2,7 @@ const courseModel = require("../models/courses");
 const { Rating } = require("../models/rating");
 const ratingModel = require("../models/rating");
 const lessonModel = require("../models/lessons");
+const { RecentActivity } = require("../models/recent-activity");
 
 exports.getCourses = async (req, res) => {
   try {
@@ -15,8 +16,13 @@ exports.getCourses = async (req, res) => {
     const parsedCourses = [];
     for (const course of courses) {
       let userRating = 0;
+      let userEnrollment = false;
       if (req.query.user !== "undefined") {
         userRating = await Rating.findOne({
+          user_id: req.query.user,
+          course_id: course._id,
+        });
+        userEnrollment = await RecentActivity.find({
           user_id: req.query.user,
           course_id: course._id,
         });
@@ -38,6 +44,7 @@ exports.getCourses = async (req, res) => {
         ...course._doc,
         rating: ratings.length ? ratings[0].average : 0,
         hasRating: userRating ? userRating._doc.rating : 0,
+        isUserEnrolled: userEnrollment.length !== 0 ? true : false,
       });
     }
     return res.json(parsedCourses);
@@ -103,7 +110,7 @@ exports.updateCourse = async (req, res) => {
       { $set: req.body },
       { new: true }
     );
-    console.log(course.user)
+    console.log(course.user);
     const userRating = await Rating.findOne({
       user_id: req.query.user,
       course_id: course._id,

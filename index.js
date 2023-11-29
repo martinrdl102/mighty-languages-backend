@@ -84,6 +84,8 @@ app.delete("/ratings", ratingController.deleteRating);
 
 app.post("/recent_activity", recentActivityController.addRecentActivity)
 
+app.get("/recent_activity/:id", recentActivityController.getRecentActivity);
+
 app.put("/recent_activity", recentActivityController.editRecentActivity)
 
 app.delete("/recent_activity", recentActivityController.deleteRecentActivity)
