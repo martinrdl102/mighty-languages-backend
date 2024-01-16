@@ -2,7 +2,7 @@ const courseModel = require("../models/courses");
 const { Rating } = require("../models/rating");
 const ratingModel = require("../models/rating");
 const lessonModel = require("../models/lessons");
-const { RecentActivity } = require("../models/recent-activity");
+const { CourseEnrollment } = require("../models/course-enrollment");
 
 exports.getCourses = async (req, res) => {
   try {
@@ -15,37 +15,43 @@ exports.getCourses = async (req, res) => {
     );
     const parsedCourses = [];
     for (const course of courses) {
-      let userRating = 0;
-      let userEnrollment = false;
-      if (req.query.user !== "undefined") {
-        userRating = await Rating.findOne({
-          user_id: req.query.user,
-          course_id: course._id,
-        });
-        userEnrollment = await RecentActivity.find({
-          user_id: req.query.user,
-          course_id: course._id,
+      const hasLessons =
+        (await lessonModel.Lesson.findOne({
+          course: course._id,
+        })) !== null;
+      if (hasLessons) {
+        let userRating = 0;
+        let userEnrollment = false;
+        if (req.query.userId !== "undefined") {
+          userRating = await Rating.findOne({
+            user_id: req.query.userId,
+            course_id: course._id,
+          });
+          userEnrollment = await CourseEnrollment.find({
+            user: req.query.userId,
+            course: course._id,
+          });
+        }
+        const ratings = await Rating.aggregate([
+          {
+            $match: {
+              course_id: course._id,
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              average: { $avg: "$rating" },
+            },
+          },
+        ]);
+        parsedCourses.push({
+          ...course._doc,
+          rating: ratings.length ? ratings[0].average : 0,
+          hasRating: userRating ? userRating._doc.rating : 0,
+          isUserEnrolled: userEnrollment.length !== 0 ? true : false,
         });
       }
-      const ratings = await Rating.aggregate([
-        {
-          $match: {
-            course_id: course._id,
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            average: { $avg: "$rating" },
-          },
-        },
-      ]);
-      parsedCourses.push({
-        ...course._doc,
-        rating: ratings.length ? ratings[0].average : 0,
-        hasRating: userRating ? userRating._doc.rating : 0,
-        isUserEnrolled: userEnrollment.length !== 0 ? true : false,
-      });
     }
     return res.json(parsedCourses);
   } catch (err) {
@@ -60,6 +66,7 @@ exports.postCourse = async (req, res) => {
     description: req.body.description,
     rating: 0,
     imageURL: req.body.imageURL,
+    instructor: req.body.instructor,
   });
   try {
     const course = await newCourse.save();
@@ -75,7 +82,7 @@ exports.getCourse = async (req, res) => {
     let userRating = 0;
     if (req.query.user !== "undefined") {
       userRating = await Rating.findOne({
-        user_id: req.query.user,
+        user_id: req.query.userId,
         course_id: course._id,
       });
     }
@@ -92,10 +99,15 @@ exports.getCourse = async (req, res) => {
         },
       },
     ]);
+    const courseEnrollment = await CourseEnrollment.findOne({
+      course: req.params.id,
+      user_id: req.query.userId,
+    });
     course = {
       ...course._doc,
       rating: ratings.length ? ratings[0].average : 0,
       hasRating: userRating ? userRating.rating : 0,
+      isUserEnrolled: courseEnrollment?.isActive,
     };
     return res.json(course);
   } catch (err) {
@@ -110,9 +122,8 @@ exports.updateCourse = async (req, res) => {
       { $set: req.body },
       { new: true }
     );
-    console.log(course.user);
     const userRating = await Rating.findOne({
-      user_id: req.query.user,
+      user_id: req.query.userId,
       course_id: course._id,
     });
     const courseRating = await Rating.find({
