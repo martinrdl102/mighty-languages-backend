@@ -2,16 +2,15 @@ const mongoose = require("mongoose")
 
 
 
-const optionTypeSchema = new mongoose.Schema ( {
-    id: Number,
-    label: String
+const choiceTypeSchema = new mongoose.Schema ( {
+    type: String
 })
 
 const OptionType = mongoose.model('OptionType', optionTypeSchema)
 
 const schema = new mongoose.Schema({
     type: String,
-    options: [optionTypeSchema], 
+    options: [choiceTypeSchema], 
     "first-statement": String,
     "last-statement": String,
     solution: String,
