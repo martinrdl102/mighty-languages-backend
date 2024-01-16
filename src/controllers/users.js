@@ -5,7 +5,7 @@ const { use } = require("passport");
 
 exports.register = async (req, res) => {
   try {
-    const { name, profile_pic, email, password } = req.body;
+    const { name, profile_pic, email, password, type } = req.body;
 
     if (!(name && email && password)) {
       res.status(400).send("Faltan campos por llenar");
@@ -23,6 +23,7 @@ exports.register = async (req, res) => {
       profile_pic,
       email: email.toLowerCase(),
       password: encryptedPassword,
+      type,
     });
 
     const token = jwt.sign({ user_id: user._id, email }, "martin123", {
