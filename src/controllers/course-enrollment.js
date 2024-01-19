@@ -6,7 +6,7 @@ exports.addCourseEnrollment = async (req, res) => {
       user: req.body.userId,
       course: req.body.courseId,
       finishedLessons: [],
-      current_lesson: req.body.lessonId,
+      currentLesson: req.body.lessonId,
       isActive: true,
       isCompleted: false,
       dateLastActivity: new Date(),
@@ -41,6 +41,17 @@ exports.getCourseEnrollments = async (req, res) => {
       { user: req.params.userId, isCompleted: false }
     ).populate("course");
     return res.json(courseEnrollments);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};
+
+exports.getCourseEnrollment = async (req, res) => {
+  try {
+    const courseEnrollment = await courseEnrollmentModel.CourseEnrollment.findOne(
+      { user: req.query.userId, course: req.query.courseId }
+    );
+    return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
   }

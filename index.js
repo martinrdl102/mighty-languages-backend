@@ -91,6 +91,8 @@ app.get(
   courseEnrollmentController.getCourseEnrollments
 );
 
+app.get("/course_enrollment", courseEnrollmentController.getCourseEnrollment);
+
 app.listen(port, () =>
   console.log(`Hello world app listening on port ${port}!`)
 );
