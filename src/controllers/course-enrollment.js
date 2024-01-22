@@ -26,7 +26,7 @@ exports.editCourseEnrollment = async (req, res) => {
           user: req.query.userId,
           course: req.query.courseId,
         },
-        { $set: req.body },
+        { $set: { ...req.body, dateLastActivity: new Date() } },
         { new: true }
       );
     return res.json(courseEnrollment);
@@ -48,9 +48,11 @@ exports.getCourseEnrollments = async (req, res) => {
 
 exports.getCourseEnrollment = async (req, res) => {
   try {
-    const courseEnrollment = await courseEnrollmentModel.CourseEnrollment.findOne(
-      { user: req.query.userId, course: req.query.courseId }
-    );
+    const courseEnrollment =
+      await courseEnrollmentModel.CourseEnrollment.findOne({
+        user: req.query.userId,
+        course: req.query.courseId,
+      });
     return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
