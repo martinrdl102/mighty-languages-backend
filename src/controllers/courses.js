@@ -101,7 +101,7 @@ exports.getCourse = async (req, res) => {
     ]);
     const courseEnrollment = await CourseEnrollment.findOne({
       course: req.params.id,
-      user_id: req.query.userId,
+      user: req.query.userId,
     });
     course = {
       ...course._doc,
