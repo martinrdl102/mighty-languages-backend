@@ -5,7 +5,7 @@ exports.addCourseEnrollment = async (req, res) => {
     const newCourseEnrollment = new courseEnrollmentModel.CourseEnrollment({
       user: req.body.userId,
       course: req.body.courseId,
-      finishedLessons: [],
+      finishedLessonsIds: [],
       currentLesson: req.body.lessonId,
       isActive: true,
       isCompleted: false,
@@ -35,10 +35,72 @@ exports.editCourseEnrollment = async (req, res) => {
   }
 };
 
+exports.setCurrentLesson = async (req, res) => {
+  try {
+    const courseEnrollment =
+      await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
+        {
+          user: req.body.userId,
+          course: req.body.courseId,
+        },
+        { $set: { currentLesson: req.body.lessonId, dateLastActivity: new Date() } },
+        { new: true }
+      );
+    return res.json(courseEnrollment);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};
+
+exports.addFinishedLesson = async (req, res) => {
+  try {
+    let finishedLessonsIds = (
+      await courseEnrollmentModel.CourseEnrollment.findOne({
+        user: req.body.userId,
+        course: req.body.courseId,
+      })
+    ).finishedLessonsIds;
+    if (!finishedLessonsIds.includes(req.body.lessonId)) {
+      finishedLessonsIds.push(req.body.lessonId);
+      const courseEnrollment =
+        await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
+          {
+            user: req.body.userId,
+            course: req.body.courseId,
+          },
+          { $set: { finishedLessonsIds, dateLastActivity: new Date() } },
+          { new: true }
+        );
+      return res.json(courseEnrollment);
+    }
+
+    return res.json(null);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};
+
+exports.completeCourse = async (req, res) => {
+  try {
+    const courseEnrollment =
+      await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
+        {
+          user: req.body.userId,
+          course: req.body.courseId,
+        },
+        { $set: { isCompleted: true, dateLastActivity: new Date() } },
+        { new: true }
+      );
+    return res.json(courseEnrollment);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};
+
 exports.getCourseEnrollments = async (req, res) => {
   try {
     const courseEnrollments = await courseEnrollmentModel.CourseEnrollment.find(
-      { user: req.params.userId, isCompleted: false }
+      { user: req.params.user_id, isCompleted: false }
     ).populate("course");
     return res.json(courseEnrollments);
   } catch (err) {

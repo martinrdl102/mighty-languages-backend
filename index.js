@@ -86,8 +86,23 @@ app.post("/course_enrollment", courseEnrollmentController.addCourseEnrollment);
 
 app.put("/course_enrollment", courseEnrollmentController.editCourseEnrollment);
 
+app.put(
+  "/course_enrollment/set_current_lesson",
+  courseEnrollmentController.setCurrentLesson
+);
+
+app.put(
+  "/course_enrollment/add_finished_lesson",
+  courseEnrollmentController.addFinishedLesson
+);
+
+app.put(
+  "/course_enrollment/complete_course",
+  courseEnrollmentController.completeCourse
+);
+
 app.get(
-  "/course_enrollment/:userId",
+  "/course_enrollment/:user_id",
   courseEnrollmentController.getCourseEnrollments
 );
 
