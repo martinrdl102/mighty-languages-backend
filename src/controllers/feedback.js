@@ -2,8 +2,8 @@ const feedbackModel = require("../models/feedback");
 
 exports.addFeedback = async (req, res) => {
   const newFeedback = new feedbackModel.Feedback({
-    user_id: req.body.user_id,
-    comment_id: req.body.comment_id,
+    userId: req.body.userId,
+    commentId: req.body.commentId,
     type: req.body.type,
   });
   try {
@@ -19,8 +19,8 @@ exports.editFeedback = async (req, res) => {
   try {
     const feedback = await feedbackModel.Feedback.findOneAndUpdate(
       {
-        user_id: req.query.userId,
-        comment_id: req.query.commentId,
+        userId: req.query.userId,
+        commentId: req.query.commentId,
       },
       { $set: req.body }, //{type}
       { new: true }
@@ -34,8 +34,8 @@ exports.editFeedback = async (req, res) => {
 exports.deleteFeedback = async (req, res) => {
   try {
     await feedbackModel.Feedback.deleteOne({
-      user_id: req.query.userId,
-      comment_id: req.query.commentId,
+      userId: req.query.userId,
+      commentId: req.query.commentId,
     });
     return res.send("ok");
   } catch (err) {

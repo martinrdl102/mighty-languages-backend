@@ -24,8 +24,8 @@ exports.getCourses = async (req, res) => {
         let userEnrollment = false;
         if (req.query.userId !== "undefined") {
           userRating = await Rating.findOne({
-            user_id: req.query.userId,
-            course_id: course._id,
+            userId: req.query.userId,
+            courseId: course._id,
           });
           userEnrollment = await CourseEnrollment.find({
             user: req.query.userId,
@@ -35,7 +35,7 @@ exports.getCourses = async (req, res) => {
         const ratings = await Rating.aggregate([
           {
             $match: {
-              course_id: course._id,
+              courseId: course._id,
             },
           },
           {
@@ -80,16 +80,21 @@ exports.getCourse = async (req, res) => {
   try {
     let course = await courseModel.Course.findById(req.params.id);
     let userRating = 0;
-    if (req.query.user !== "undefined") {
+    let courseEnrollment = null;
+    if (req.query.userId !== "undefined") {
       userRating = await Rating.findOne({
-        user_id: req.query.userId,
-        course_id: course._id,
+        userId: req.query.userId,
+        courseId: course._id,
+      });
+      courseEnrollment = await CourseEnrollment.findOne({
+        course: req.params.id,
+        user: req.query.userId,
       });
     }
     const ratings = await Rating.aggregate([
       {
         $match: {
-          course_id: course._id,
+          courseId: course._id,
         },
       },
       {
@@ -99,10 +104,6 @@ exports.getCourse = async (req, res) => {
         },
       },
     ]);
-    const courseEnrollment = await CourseEnrollment.findOne({
-      course: req.params.id,
-      user: req.query.userId,
-    });
     course = {
       ...course._doc,
       rating: ratings.length ? ratings[0].average : 0,
@@ -123,11 +124,11 @@ exports.updateCourse = async (req, res) => {
       { new: true }
     );
     const userRating = await Rating.findOne({
-      user_id: req.query.userId,
-      course_id: course._id,
+      userId: req.query.userId,
+      courseId: course._id,
     });
     const courseRating = await Rating.find({
-      course_id: course._id,
+      courseId: course._id,
     }).count();
     const courseCopy = {
       ...course._doc,
@@ -143,8 +144,8 @@ exports.updateCourse = async (req, res) => {
 exports.deleteCourse = async (req, res) => {
   try {
     const course = await courseModel.Course.findByIdAndDelete(req.params.id);
-    await lessonModel.Lesson.deleteMany({ course_id: req.params.id });
-    await ratingModel.Rating.deleteMany({ course_id: req.params.id });
+    await lessonModel.Lesson.deleteMany({ course: req.params.id });
+    await ratingModel.Rating.deleteMany({ courseId: req.params.id });
     return res.json(course);
   } catch (err) {
     res.status(500).send(err.message);

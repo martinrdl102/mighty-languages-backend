@@ -5,7 +5,7 @@ exports.postLesson = async (req, res) => {
   const newLesson = new lessonModel.Lesson({
     title: req.body.title,
     videos: req.body.videos,
-    course_id: req.body.course_id,
+    course: req.body.courseId,
   });
   try {
     const createdLesson = await newLesson.save();

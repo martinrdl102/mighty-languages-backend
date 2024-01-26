@@ -5,7 +5,7 @@ const { use } = require("passport");
 
 exports.register = async (req, res) => {
   try {
-    const { name, profile_pic, email, password, type } = req.body;
+    const { name, profilePic, email, password, type } = req.body;
 
     if (!(name && email && password)) {
       res.status(400).send("Faltan campos por llenar");
@@ -20,13 +20,13 @@ exports.register = async (req, res) => {
 
     const user = await userModel.User.create({
       name,
-      profile_pic,
+      profilePic,
       email: email.toLowerCase(),
       password: encryptedPassword,
       type,
     });
 
-    const token = jwt.sign({ user_id: user._id, email }, "martin123", {
+    const token = jwt.sign({ userId: user._id, email }, "martin123", {
       expiresIn: "2h",
     });
     user.token = token;
@@ -47,7 +47,7 @@ exports.login = async (req, res) => {
 
     const user = await userModel.User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign({ user_id: user._id, email }, "martin123", {
+      const token = jwt.sign({ userId: user._id, email }, "martin123", {
         expiresIn: "2h",
       });
       user.token = token;

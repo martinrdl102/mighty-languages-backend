@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  comment_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comment" },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  commentId: { type: mongoose.Schema.Types.ObjectId, ref: "Comment" },
   type: { type: String, enum: ["like", "dislike"] },
 });
 

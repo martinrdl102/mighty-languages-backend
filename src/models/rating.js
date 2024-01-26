@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  course_id: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
   rating: Number,
 });
 

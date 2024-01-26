@@ -2,8 +2,8 @@ const ratingModel = require("../models/rating");
 
 exports.addRating = async (req, res) => {
   const newRating = new ratingModel.Rating({
-    user_id: req.body.user_id,
-    course_id: req.body.course_id,
+    userId: req.body.userId,
+    courseId: req.body.courseId,
     rating: req.body.rating,
   });
   try {
@@ -19,8 +19,8 @@ exports.editRating = async (req, res) => {
   try {
     const rating = await ratingModel.Rating.findOneAndUpdate(
       {
-        user_id: req.query.userId,
-        course_id: req.query.courseId,
+        userId: req.query.userId,
+        courseId: req.query.courseId,
       },
       { $set: req.body }, //{rating}
       { new: true }
@@ -34,8 +34,8 @@ exports.editRating = async (req, res) => {
 exports.deleteRating = async (req, res) => {
   try {
     await ratingModel.Rating.deleteOne({
-      user_id: req.query.userId,
-      course_id: req.query.courseId,
+      userId: req.query.userId,
+      courseId: req.query.courseId,
     });
     return res.send("ok");
   } catch (err) {

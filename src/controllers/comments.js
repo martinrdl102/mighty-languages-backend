@@ -5,24 +5,24 @@ const { Feedback } = require("../models/feedback");
 exports.getComments = async (req, res) => {
   try {
     const comments = await commentModel.Comment.find({
-      lesson_id: req.params.id,
+      lessonId: req.params.id,
     }).populate("user");
     const parsedComments = [];
     for (const comment of comments) {
       let feedback = false;
       if (req.query.userId !== "undefined") {
         feedback = await Feedback.findOne({
-          user_id: req.query.userId,
-          comment_id: comment._id,
+          userId: req.query.userId,
+          commentId: comment._id,
         });
       }
       const likes = await Feedback.find({
         type: "like",
-        comment_id: comment._id,
+        commentId: comment._id,
       }).count();
       const dislikes = await Feedback.find({
         type: "dislike",
-        comment_id: comment._id,
+        commentId: comment._id,
       }).count();
       parsedComments.push({
         ...comment._doc,
@@ -41,7 +41,7 @@ exports.postComment = async (req, res) => {
   let newComment = new commentModel.Comment({
     user: req.body.user,
     comment: req.body.comment,
-    lesson_id: req.body.lesson_id,
+    lessonId: req.body.lessonId,
   });
   try {
     await newComment.save();
@@ -56,7 +56,7 @@ exports.postComment = async (req, res) => {
 exports.deleteComment = async (req, res) => {
   try {
     const comment = await commentModel.Comment.findByIdAndDelete(req.params.id);
-    await feedbackModel.Feedback.deleteMany({ comment_id: req.params.id });
+    await feedbackModel.Feedback.deleteMany({ commentId: req.params.id });
     res.json(comment);
   } catch (error) {
     res.send(error.message);
@@ -71,16 +71,16 @@ exports.editComment = async (req, res) => {
       { new: true }
     ).populate("user");
     const feedback = await Feedback.findOne({
-      user_id: comment.user._id,
-      comment_id: comment._id,
+      userId: comment.user._id,
+      commentId: comment._id,
     });
     const likes = await Feedback.find({
       type: "like",
-      comment_id: comment._id,
+      commentId: comment._id,
     }).count();
     const dislikes = await Feedback.find({
       type: "dislike",
-      comment_id: comment._id,
+      commentId: comment._id,
     }).count();
     const commentCopy = {
       ...comment._doc,
