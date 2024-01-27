@@ -22,13 +22,13 @@ exports.getCourses = async (req, res) => {
       if (hasLessons) {
         let userRating = 0;
         let userEnrollment = false;
-        if (req.query.userId !== "undefined") {
+        if (req.query.user_id !== "undefined") {
           userRating = await Rating.findOne({
-            userId: req.query.userId,
+            userId: req.query.user_id,
             courseId: course._id,
           });
           userEnrollment = await CourseEnrollment.find({
-            user: req.query.userId,
+            user: req.query.user_id,
             course: course._id,
           });
         }
@@ -81,14 +81,14 @@ exports.getCourse = async (req, res) => {
     let course = await courseModel.Course.findById(req.params.id);
     let userRating = 0;
     let courseEnrollment = null;
-    if (req.query.userId !== "undefined") {
+    if (req.query.user_id !== "undefined") {
       userRating = await Rating.findOne({
-        userId: req.query.userId,
+        userId: req.query.user_id,
         courseId: course._id,
       });
       courseEnrollment = await CourseEnrollment.findOne({
         course: req.params.id,
-        user: req.query.userId,
+        user: req.query.user_id,
       });
     }
     const ratings = await Rating.aggregate([
@@ -124,7 +124,7 @@ exports.updateCourse = async (req, res) => {
       { new: true }
     );
     const userRating = await Rating.findOne({
-      userId: req.query.userId,
+      userId: req.query.user_id,
       courseId: course._id,
     });
     const courseRating = await Rating.find({

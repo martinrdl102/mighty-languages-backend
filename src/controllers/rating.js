@@ -19,8 +19,8 @@ exports.editRating = async (req, res) => {
   try {
     const rating = await ratingModel.Rating.findOneAndUpdate(
       {
-        userId: req.query.userId,
-        courseId: req.query.courseId,
+        userId: req.query.user_id,
+        courseId: req.query.course_id,
       },
       { $set: req.body }, //{rating}
       { new: true }
@@ -34,8 +34,8 @@ exports.editRating = async (req, res) => {
 exports.deleteRating = async (req, res) => {
   try {
     await ratingModel.Rating.deleteOne({
-      userId: req.query.userId,
-      courseId: req.query.courseId,
+      userId: req.query.user_id,
+      courseId: req.query.course_id,
     });
     return res.send("ok");
   } catch (err) {

@@ -23,8 +23,8 @@ exports.editCourseEnrollment = async (req, res) => {
     const courseEnrollment =
       await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
         {
-          user: req.query.userId,
-          course: req.query.courseId,
+          user: req.query.user_id,
+          course: req.query.course_id,
         },
         { $set: { ...req.body, dateLastActivity: new Date() } },
         { new: true }
@@ -46,6 +46,7 @@ exports.setCurrentLesson = async (req, res) => {
         { $set: { currentLesson: req.body.lessonId, dateLastActivity: new Date() } },
         { new: true }
       );
+      console.log(courseEnrollment);
     return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
@@ -112,8 +113,8 @@ exports.getCourseEnrollment = async (req, res) => {
   try {
     const courseEnrollment =
       await courseEnrollmentModel.CourseEnrollment.findOne({
-        user: req.query.userId,
-        course: req.query.courseId,
+        user: req.query.user_id,
+        course: req.query.course_id,
       });
     return res.json(courseEnrollment);
   } catch (err) {

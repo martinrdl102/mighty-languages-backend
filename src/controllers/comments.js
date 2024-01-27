@@ -10,9 +10,9 @@ exports.getComments = async (req, res) => {
     const parsedComments = [];
     for (const comment of comments) {
       let feedback = false;
-      if (req.query.userId !== "undefined") {
+      if (req.query.user_id !== "undefined") {
         feedback = await Feedback.findOne({
-          userId: req.query.userId,
+          userId: req.query.user_id,
           commentId: comment._id,
         });
       }
