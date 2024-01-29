@@ -15,11 +15,11 @@ exports.getCourses = async (req, res) => {
     );
     const parsedCourses = [];
     for (const course of courses) {
-      const hasLessons =
-        (await lessonModel.Lesson.findOne({
-          course: course._id,
-        })) !== null;
-      if (hasLessons) {
+      // const hasLessons =
+        // (await lessonModel.Lesson.findOne({
+        //   course: course._id,
+        // })) !== null;
+      if (/*hasLessons*/ true) {
         let userRating = 0;
         let userEnrollment = false;
         if (req.query.user_id !== "undefined") {
