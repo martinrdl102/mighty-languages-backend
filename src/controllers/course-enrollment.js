@@ -46,7 +46,6 @@ exports.setCurrentLesson = async (req, res) => {
         { $set: { currentLesson: req.body.lessonId, dateLastActivity: new Date() } },
         { new: true }
       );
-      console.log(courseEnrollment);
     return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
