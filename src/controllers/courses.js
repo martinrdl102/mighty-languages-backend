@@ -2,6 +2,7 @@ const courseModel = require("../models/courses");
 const { Rating } = require("../models/rating");
 const ratingModel = require("../models/rating");
 const lessonModel = require("../models/lessons");
+const userModel = require("../models/users");
 const { CourseEnrollment } = require("../models/course-enrollment");
 
 exports.getCourses = async (req, res) => {
@@ -15,11 +16,18 @@ exports.getCourses = async (req, res) => {
     );
     const parsedCourses = [];
     for (const course of courses) {
-      // const hasLessons =
-        // (await lessonModel.Lesson.findOne({
-        //   course: course._id,
-        // })) !== null;
-      if (/*hasLessons*/ true) {
+      const hasLessons =
+        (await lessonModel.Lesson.findOne({
+          course: course._id,
+        })) !== null;
+      const user = await userModel.User.findOne({
+        _id: req.query.user_id,
+      });
+      if (
+        hasLessons ||
+        user.type === "admin" ||
+        user._id.toString() === course.instructor.toString()
+      ) {
         let userRating = 0;
         let userEnrollment = false;
         if (req.query.user_id !== "undefined") {
