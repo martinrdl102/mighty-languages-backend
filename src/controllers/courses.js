@@ -16,43 +16,44 @@ exports.getCourses = async (req, res) => {
     );
     const parsedCourses = [];
     for (const course of courses) {
+      let userEnrollment = false;
+      let userRating = 0;
+      let user = null;
       const hasLessons =
         (await lessonModel.Lesson.findOne({
           course: course._id,
         })) !== null;
-      const user = await userModel.User.findOne({
-        _id: req.query.user_id,
-      });
+      if (req.query.user_id !== "undefined") {
+        user = await userModel.User.findOne({
+          _id: req.query.user_id,
+        });
+        userRating = await Rating.findOne({
+          userId: req.query.user_id,
+          courseId: course._id,
+        });
+        userEnrollment = await CourseEnrollment.find({
+          user: req.query.user_id,
+          course: course._id,
+        });
+      }
+      const ratings = await Rating.aggregate([
+        {
+          $match: {
+            courseId: course._id,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            average: { $avg: "$rating" },
+          },
+        },
+      ]);
       if (
         hasLessons ||
-        user.type === "admin" ||
-        user._id.toString() === course.instructor.toString()
+        user?.type === "admin" ||
+        user?._id.toString() === course.instructor.toString()
       ) {
-        let userRating = 0;
-        let userEnrollment = false;
-        if (req.query.user_id !== "undefined") {
-          userRating = await Rating.findOne({
-            userId: req.query.user_id,
-            courseId: course._id,
-          });
-          userEnrollment = await CourseEnrollment.find({
-            user: req.query.user_id,
-            course: course._id,
-          });
-        }
-        const ratings = await Rating.aggregate([
-          {
-            $match: {
-              courseId: course._id,
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              average: { $avg: "$rating" },
-            },
-          },
-        ]);
         parsedCourses.push({
           ...course._doc,
           rating: ratings.length ? ratings[0].average : 0,
