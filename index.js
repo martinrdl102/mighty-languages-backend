@@ -84,7 +84,7 @@ app.delete("/ratings", ratingController.deleteRating);
 
 app.post("/course_enrollment", courseEnrollmentController.addCourseEnrollment);
 
-app.put("/course_enrollment", courseEnrollmentController.editCourseEnrollment);
+// app.put("/course_enrollment", courseEnrollmentController.editCourseEnrollment);
 
 app.put(
   "/course_enrollment/set_current_lesson",
@@ -97,16 +97,14 @@ app.put(
 );
 
 app.put(
-  "/course_enrollment/complete_course",
-  courseEnrollmentController.completeCourse
+  "/course_enrollment/leave_course",
+  courseEnrollmentController.leaveCourse
 );
 
 app.get(
   "/course_enrollment/:user_id",
   courseEnrollmentController.getCourseEnrollments
 );
-
-app.get("/course_enrollment", courseEnrollmentController.getCourseEnrollment);
 
 app.listen(port, () =>
   console.log(`Hello world app listening on port ${port}!`)
