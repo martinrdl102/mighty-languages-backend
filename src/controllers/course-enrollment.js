@@ -1,39 +1,62 @@
 const courseEnrollmentModel = require("../models/course-enrollment");
+const lessonModel = require("../models/lessons");
 
 exports.addCourseEnrollment = async (req, res) => {
   try {
-    const newCourseEnrollment = new courseEnrollmentModel.CourseEnrollment({
+    let enrollment = await courseEnrollmentModel.CourseEnrollment.findOne({
       user: req.body.userId,
       course: req.body.courseId,
-      finishedLessonsIds: [],
-      currentLesson: req.body.lessonId,
-      isActive: true,
-      isCompleted: false,
-      dateLastActivity: new Date(),
     });
-    await newCourseEnrollment.save();
-    return res.json(newCourseEnrollment);
+    if (enrollment) {
+      enrollment =
+        await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
+          {
+            user: req.body.userId,
+            course: req.body.courseId,
+          },
+          {
+            $set: {
+              isActive: true,
+              dateLastActivity: new Date(),
+            },
+          },
+          { new: true }
+        );
+    } else {
+      const newCourseEnrollment = new courseEnrollmentModel.CourseEnrollment({
+        user: req.body.userId,
+        course: req.body.courseId,
+        finishedLessonsIds: [],
+        currentLesson: req.body.lessonId,
+        isActive: true,
+        isCompleted: false,
+        dateLastActivity: new Date(),
+      });
+      await newCourseEnrollment.save();
+      return res.json(newCourseEnrollment);
+    }
+    return res.json(enrollment);
   } catch (e) {
     return res.send("Course Enrollment not created");
   }
 };
 
-exports.editCourseEnrollment = async (req, res) => {
-  try {
-    const courseEnrollment =
-      await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
-        {
-          user: req.query.user_id,
-          course: req.query.course_id,
-        },
-        { $set: { ...req.body, dateLastActivity: new Date() } },
-        { new: true }
-      );
-    return res.json(courseEnrollment);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-};
+// exports.editCourseEnrollment = async (req, res) => {
+//   try {
+//     const courseEnrollment =
+//       await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
+//         {
+//           user: req.query.user_id,
+//           course: req.query.course_id,
+//         },
+//         { $set: { ...req.body, dateLastActivity: new Date() } },
+//         { new: true }
+//       );
+//     return res.json(courseEnrollment);
+//   } catch (err) {
+//     res.status(500).send(err.message);
+//   }
+// };
 
 exports.setCurrentLesson = async (req, res) => {
   try {
@@ -43,7 +66,12 @@ exports.setCurrentLesson = async (req, res) => {
           user: req.body.userId,
           course: req.body.courseId,
         },
-        { $set: { currentLesson: req.body.lessonId, dateLastActivity: new Date() } },
+        {
+          $set: {
+            currentLesson: req.body.lessonId,
+            dateLastActivity: new Date(),
+          },
+        },
         { new: true }
       );
     return res.json(courseEnrollment);
@@ -54,15 +82,15 @@ exports.setCurrentLesson = async (req, res) => {
 
 exports.addFinishedLesson = async (req, res) => {
   try {
-    let finishedLessonsIds = (
+    let currentEnrollment =
       await courseEnrollmentModel.CourseEnrollment.findOne({
         user: req.body.userId,
         course: req.body.courseId,
-      })
-    ).finishedLessonsIds;
+      });
+    let finishedLessonsIds = currentEnrollment.finishedLessonsIds;
     if (!finishedLessonsIds.includes(req.body.lessonId)) {
       finishedLessonsIds.push(req.body.lessonId);
-      const courseEnrollment =
+      let updatedCourseEnrollment =
         await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
           {
             user: req.body.userId,
@@ -71,16 +99,35 @@ exports.addFinishedLesson = async (req, res) => {
           { $set: { finishedLessonsIds, dateLastActivity: new Date() } },
           { new: true }
         );
-      return res.json(courseEnrollment);
+      const courseLength = await lessonModel.Lesson.find({
+        course: req.body.courseId,
+      }).count();
+      if (finishedLessonsIds.length === courseLength) {
+        updatedCourseEnrollment = completeCourse({ user: req.body.userId, course: req.body.courseId });
+      }
+      return res.json(updatedCourseEnrollment);
     }
-
-    return res.json(null);
+    return res.json(currentEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
   }
 };
 
-exports.completeCourse = async (req, res) => {
+const completeCourse = async ({ user, course }) => {
+  try {
+    const courseEnrollment =
+      await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
+        { user, course },
+        { $set: { isCompleted: true, dateLastActivity: new Date() } },
+        { new: true }
+      );
+    return courseEnrollment;
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};
+
+exports.leaveCourse = async (req, res) => {
   try {
     const courseEnrollment =
       await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
@@ -88,7 +135,12 @@ exports.completeCourse = async (req, res) => {
           user: req.body.userId,
           course: req.body.courseId,
         },
-        { $set: { isCompleted: true, dateLastActivity: new Date() } },
+        {
+          $set: {
+            isActive: false,
+            dateLastActivity: new Date(),
+          },
+        },
         { new: true }
       );
     return res.json(courseEnrollment);
@@ -100,22 +152,9 @@ exports.completeCourse = async (req, res) => {
 exports.getCourseEnrollments = async (req, res) => {
   try {
     const courseEnrollments = await courseEnrollmentModel.CourseEnrollment.find(
-      { user: req.params.user_id, isCompleted: false }
+      { user: req.params.user_id, isActive: true }
     ).populate("course");
     return res.json(courseEnrollments);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-};
-
-exports.getCourseEnrollment = async (req, res) => {
-  try {
-    const courseEnrollment =
-      await courseEnrollmentModel.CourseEnrollment.findOne({
-        user: req.query.user_id,
-        course: req.query.course_id,
-      });
-    return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
   }
