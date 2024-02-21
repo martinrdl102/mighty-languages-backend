@@ -58,7 +58,6 @@ exports.getCourses = async (req, res) => {
           ...course._doc,
           rating: ratings.length ? ratings[0].average : 0,
           hasRating: userRating ? userRating._doc.rating : 0,
-          isUserEnrolled: userEnrollment.length !== 0 ? true : false,
         });
       }
     }
@@ -117,7 +116,6 @@ exports.getCourse = async (req, res) => {
       ...course._doc,
       rating: ratings.length ? ratings[0].average : 0,
       hasRating: userRating ? userRating.rating : 0,
-      isUserEnrolled: courseEnrollment?.isActive,
     };
     return res.json(course);
   } catch (err) {
