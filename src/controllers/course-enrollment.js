@@ -23,11 +23,15 @@ exports.addCourseEnrollment = async (req, res) => {
           { new: true }
         );
     } else {
+      const numberOfLessons = await lessonModel.Lesson.find({
+        course: req.body.courseId,
+      }).count();
       const newCourseEnrollment = new courseEnrollmentModel.CourseEnrollment({
         user: req.body.userId,
         course: req.body.courseId,
         finishedLessonsIds: [],
         currentLesson: req.body.lessonId,
+        numberOfLessons,
         isActive: true,
         isCompleted: false,
         dateLastActivity: new Date(),
@@ -103,7 +107,10 @@ exports.addFinishedLesson = async (req, res) => {
         course: req.body.courseId,
       }).count();
       if (finishedLessonsIds.length === courseLength) {
-        updatedCourseEnrollment = completeCourse({ user: req.body.userId, course: req.body.courseId });
+        updatedCourseEnrollment = completeCourse({
+          user: req.body.userId,
+          course: req.body.courseId,
+        });
       }
       return res.json(updatedCourseEnrollment);
     }
@@ -153,7 +160,9 @@ exports.getCourseEnrollments = async (req, res) => {
   try {
     const courseEnrollments = await courseEnrollmentModel.CourseEnrollment.find(
       { user: req.params.user_id, isActive: true }
-    ).populate("course");
+    )
+      .populate("course")
+      .populate("currentLesson");
     return res.json(courseEnrollments);
   } catch (err) {
     res.status(500).send(err.message);

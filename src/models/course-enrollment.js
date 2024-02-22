@@ -5,6 +5,7 @@ const schema = new mongoose.Schema({
   course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
   finishedLessonsIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lesson" }],
   currentLesson: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
+  numberOfLessons: Number,
   isActive: Boolean,
   isCompleted: Boolean,
   dateLastActivity: Date,
