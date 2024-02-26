@@ -21,7 +21,9 @@ exports.addCourseEnrollment = async (req, res) => {
             },
           },
           { new: true }
-        );
+        )
+          .populate("course")
+          .populate("currentLesson");
     } else {
       const numberOfLessons = await lessonModel.Lesson.find({
         course: req.body.courseId,
@@ -37,6 +39,7 @@ exports.addCourseEnrollment = async (req, res) => {
         dateLastActivity: new Date(),
       });
       await newCourseEnrollment.save();
+      newCourseEnrollment = await newCourseEnrollment.populate("course");
       return res.json(newCourseEnrollment);
     }
     return res.json(enrollment);
@@ -44,23 +47,6 @@ exports.addCourseEnrollment = async (req, res) => {
     return res.send("Course Enrollment not created");
   }
 };
-
-// exports.editCourseEnrollment = async (req, res) => {
-//   try {
-//     const courseEnrollment =
-//       await courseEnrollmentModel.CourseEnrollment.findOneAndUpdate(
-//         {
-//           user: req.query.user_id,
-//           course: req.query.course_id,
-//         },
-//         { $set: { ...req.body, dateLastActivity: new Date() } },
-//         { new: true }
-//       );
-//     return res.json(courseEnrollment);
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// };
 
 exports.setCurrentLesson = async (req, res) => {
   try {
@@ -77,7 +63,9 @@ exports.setCurrentLesson = async (req, res) => {
           },
         },
         { new: true }
-      );
+      )
+        .populate("course")
+        .populate("currentLesson");
     return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
@@ -102,7 +90,9 @@ exports.addFinishedLesson = async (req, res) => {
           },
           { $set: { finishedLessonsIds, dateLastActivity: new Date() } },
           { new: true }
-        );
+        )
+          .populate("course")
+          .populate("currentLesson");
       const courseLength = await lessonModel.Lesson.find({
         course: req.body.courseId,
       }).count();
@@ -127,7 +117,7 @@ const completeCourse = async ({ user, course }) => {
         { user, course },
         { $set: { isCompleted: true, dateLastActivity: new Date() } },
         { new: true }
-      );
+      ).populate("course");
     return courseEnrollment;
   } catch (err) {
     res.status(500).send(err.message);
@@ -149,7 +139,7 @@ exports.leaveCourse = async (req, res) => {
           },
         },
         { new: true }
-      );
+      ).populate("course");
     return res.json(courseEnrollment);
   } catch (err) {
     res.status(500).send(err.message);
