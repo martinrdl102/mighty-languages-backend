@@ -12,7 +12,7 @@ const schema = new mongoose.Schema({
   lesson: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
   statements: [
     {
-      type: String,
+      type: { type: String},
       value: String,
       options: [{ value: String, isAnswer: Boolean }],
     },
