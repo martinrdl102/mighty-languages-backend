@@ -2,7 +2,6 @@ const { QUESTION_TYPES } = require("../helpers");
 const questionModel = require("../models/questions");
 
 exports.postQuestion = async (req, res) => {
-  console.log(req.body.type, req.body.lessonId, req.body.statements);
   const newQuestion = new questionModel.Question({
     type: req.body.type,
     lesson: req.body.lessonId,
@@ -44,7 +43,9 @@ exports.updateQuestion = async (req, res) => {
 
 exports.deleteQuestion = async (req, res) => {
   try {
-    const question = await courseModel.Course.findByIdAndDelete(req.params.id);
+    const question = await questionModel.Question.findByIdAndDelete(
+      req.params.id
+    );
     return res.json(question);
   } catch (err) {
     res.status(500).send(err.message);
