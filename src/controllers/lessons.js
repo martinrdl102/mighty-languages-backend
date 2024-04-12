@@ -1,6 +1,7 @@
 const lessonModel = require("../models/lessons");
 const commentModel = require("../models/comments");
 const courseEnrollmentModel = require("../models/course-enrollment");
+const questionModel = require("../models/questions");
 
 exports.postLesson = async (req, res) => {
   const newLesson = new lessonModel.Lesson({
@@ -89,6 +90,7 @@ exports.deleteLesson = async (req, res) => {
       req.params.id
     );
     await commentModel.Comment.deleteMany({ lessonId: req.params.id });
+    await questionModel.Question.deleteMany({ lesson: req.params.id });
     const numOfLessonsInCourse = await lessonModel.Lesson.find({
       course: lesson.course,
     }).count();
