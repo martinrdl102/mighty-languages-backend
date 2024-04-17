@@ -1,6 +1,6 @@
 const QUESTION_TYPES = {
-    MULT_CHOICE: { id: 'MULT_CHOICE', value: "Opción Múltiple"},
-    FILLING: { id: 'FILLING', value: "Rellenar"},
+    MULT_CHOICE: { id: 'MULT_CHOICE', label: "Opción Múltiple"},
+    FILLING: { id: 'FILLING', label: "Rellenar"},
 }
 
 
