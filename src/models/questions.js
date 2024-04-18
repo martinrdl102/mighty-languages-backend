@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { QUESTION_TYPES } = require("../helpers");
+const { QUESTION_TYPES, STATEMENT_TYPES } = require("../helpers");
 
 const schema = new mongoose.Schema({
   type: {
@@ -12,7 +12,13 @@ const schema = new mongoose.Schema({
   lesson: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
   statements: [
     {
-      type: { type: String},
+      type: {
+        id: {
+          type: String,
+          enum: Object.keys(STATEMENT_TYPES),
+        },
+        value: String,
+      },
       value: String,
       options: [{ value: String, isAnswer: Boolean }],
     },
@@ -21,4 +27,3 @@ const schema = new mongoose.Schema({
 
 const Question = mongoose.model("Question", schema);
 module.exports = { Question, schema };
-

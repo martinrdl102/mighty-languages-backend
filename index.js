@@ -115,6 +115,8 @@ app.delete("/questions/:id", questionController.deleteQuestion);
 
 app.get("/question_types", questionController.getQuestionsTypes);
 
+app.get("/statement_types", questionController.getStatementTypes);
+
 app.listen(port, () =>
   console.log(`Hello world app listening on port ${port}!`)
 );

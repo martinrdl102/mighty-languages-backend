@@ -1,4 +1,4 @@
-const { QUESTION_TYPES } = require("../helpers");
+const { QUESTION_TYPES, STATEMENT_TYPES } = require("../helpers");
 const questionModel = require("../models/questions");
 
 exports.postQuestion = async (req, res) => {
@@ -60,3 +60,11 @@ exports.getQuestionsTypes = async (req, res) => {
     res.status(500).send(err.message);
   }
 };
+
+exports.getStatementTypes = async (req, res) => {
+  try {
+    return res.json(STATEMENT_TYPES);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
