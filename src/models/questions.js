@@ -7,17 +7,17 @@ const schema = new mongoose.Schema({
       type: String,
       enum: Object.keys(QUESTION_TYPES),
     },
-    value: String,
+    label: String,
   },
   lesson: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
   statements: [
     {
-      type: {
+      statementType: {
         id: {
           type: String,
           enum: Object.keys(STATEMENT_TYPES),
         },
-        value: String,
+        label: String,
       },
       value: String,
       options: [{ value: String, isAnswer: Boolean }],
