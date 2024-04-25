@@ -20,7 +20,8 @@ const schema = new mongoose.Schema({
         label: String,
       },
       value: String,
-      options: [{ value: String, isAnswer: Boolean }],
+      options: [{ value: String, isAnswer: Boolean, _id: false }],
+      _id: false,
     },
   ],
 });
