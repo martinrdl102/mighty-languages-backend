@@ -17,8 +17,9 @@ exports.postQuizResults = async (req, res) => {
 
 exports.getResultsFromLessonId = async (req, res) => {
   try {
-    const results = await quizResultsModel.QuizResult.find({
+    const results = await quizResultsModel.QuizResult.findOne({
       lesson: req.params.id,
+      user: req.params.user_id,
     });
     return res.json(results);
   } catch (err) {

@@ -121,7 +121,7 @@ app.get("/statement_types", questionController.getStatementTypes);
 app.post("/quiz_results", quizResultsController.postQuizResults);
 
 app.get(
-  "/lessons/:id/quiz_results",
+  "/lessons/:id/quiz_results/:user_id",
   quizResultsController.getResultsFromLessonId
 );
 
