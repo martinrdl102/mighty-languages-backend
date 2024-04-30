@@ -13,6 +13,7 @@ const feedbackController = require("./src/controllers/feedback");
 const ratingController = require("./src/controllers/rating");
 const courseEnrollmentController = require("./src/controllers/course-enrollment");
 const questionController = require("./src/controllers/questions");
+const quizResultsController = require("./src/controllers/quiz-results");
 
 const jsonParser = bodyParser.json();
 
@@ -116,6 +117,17 @@ app.delete("/questions/:id", questionController.deleteQuestion);
 app.get("/question_types", questionController.getQuestionsTypes);
 
 app.get("/statement_types", questionController.getStatementTypes);
+
+app.post("/quiz_results", quizResultsController.postQuizResults);
+
+app.get(
+  "/lessons/:id/quiz_results",
+  quizResultsController.getResultsFromLessonId
+);
+
+app.put("/quiz_results/:id", quizResultsController.updateQuizResults);
+
+app.delete("/quiz_results/:id", quizResultsController.deleteQuizResults);
 
 app.listen(port, () =>
   console.log(`Hello world app listening on port ${port}!`)
