@@ -5,6 +5,7 @@ const schema = new mongoose.Schema({
   videos: [String],
   course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
   index: Number,
+  isQuizActive: Boolean,
 });
 
 const Lesson = mongoose.model("Lesson", schema);
