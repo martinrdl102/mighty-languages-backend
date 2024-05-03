@@ -8,6 +8,7 @@ exports.postLesson = async (req, res) => {
     title: req.body.title,
     videos: req.body.videos,
     course: req.body.courseId,
+    isQuizActive: false,
   });
   try {
     const createdLesson = await newLesson.save();
