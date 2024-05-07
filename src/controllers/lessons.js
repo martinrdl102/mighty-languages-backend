@@ -36,35 +36,40 @@ exports.getLessonsFromCourseId = async (req, res) => {
   }
 };
 
+const parseLesson = async (lesson) => {
+  const prevLesson = await lessonModel.Lesson.find({
+    _id: { $lt: lesson._id },
+    course: lesson._doc.course,
+  })
+    .sort({ _id: -1 })
+    .limit(1);
+  const nextLesson = await lessonModel.Lesson.find({
+    _id: { $gt: lesson._id },
+    course: lesson._doc.course,
+  })
+    .sort({ _id: 1 })
+    .limit(1);
+
+  const courseLessons = await lessonModel.Lesson.find({
+    course: lesson._doc.course,
+  });
+  return {
+    ...lesson._doc,
+    prevLesson: prevLesson[0]?._id,
+    nextLesson: nextLesson[0]?._id,
+    index: courseLessons.findIndex((elem) => {
+      return elem._id.toString() === lesson._id.toString();
+    }),
+  };
+};
+
 exports.getLesson = async (req, res) => {
   try {
     const lesson = await lessonModel.Lesson.findById(req.params.id).populate(
       "course"
     );
-    const prevLesson = await lessonModel.Lesson.find({
-      _id: { $lt: req.params.id },
-      course: lesson._doc.course,
-    })
-      .sort({ _id: -1 })
-      .limit(1);
-    const nextLesson = await lessonModel.Lesson.find({
-      _id: { $gt: req.params.id },
-      course: lesson._doc.course,
-    })
-      .sort({ _id: 1 })
-      .limit(1);
-
-    const courseLessons = await lessonModel.Lesson.find({
-      course: lesson._doc.course,
-    });
-    const parsedLesson = {
-      ...lesson._doc,
-      prevLesson: prevLesson[0]?._id,
-      nextLesson: nextLesson[0]?._id,
-      index: courseLessons.findIndex((elem) => {
-        return elem._id.toString() === req.params.id;
-      }),
-    };
+    const parsedLesson = await parseLesson(lesson);
+    console.log(parsedLesson);
     return res.json(parsedLesson);
   } catch (err) {
     res.status(500).send(err.message);
@@ -77,8 +82,9 @@ exports.updateLesson = async (req, res) => {
       req.params.id,
       { $set: req.body },
       { new: true }
-    );
-    return res.json(lesson);
+    ).populate("course");
+    const parsedLesson = await parseLesson(lesson);
+    return res.json(parsedLesson);
   } catch (err) {
     res.status(500).send(err.message);
   }
