@@ -28,7 +28,9 @@ exports.postLesson = async (req, res) => {
 
 exports.getLessonsFromCourseId = async (req, res) => {
   try {
-    const lessons = await lessonModel.Lesson.find({ course: req.params.id });
+    const lessons = await lessonModel.Lesson.find({
+      course: req.params.id,
+    }).populate("course");
     return res.json(lessons);
   } catch (err) {
     console.log(err);
