@@ -71,7 +71,6 @@ exports.getLesson = async (req, res) => {
       "course"
     );
     const parsedLesson = await parseLesson(lesson);
-    console.log(parsedLesson);
     return res.json(parsedLesson);
   } catch (err) {
     res.status(500).send(err.message);
