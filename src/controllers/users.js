@@ -54,9 +54,11 @@ exports.login = async (req, res) => {
 
       res.status(200).json(user);
     }
-    res.status(400).send("Credenciales No Validas");
+    throw Error("Credenciales No Validas");
   } catch (err) {
-    console.log(err.message);
+    return res
+      .status(404)
+      .json({ error: "Usuario o contraseña incorrectos", code: 404 });
   }
 };
 
