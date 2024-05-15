@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
       });
       user.token = token;
 
-      res.status(200).json(user);
+      return res.status(200).json(user);
     }
     throw Error("Credenciales No Validas");
   } catch (err) {
