@@ -60,6 +60,8 @@ app.get("/courses/:id/lessons", lessonController.getLessonsFromCourseId);
 
 app.get("/lessons/:id", lessonController.getLesson);
 
+app.put("/lessons/change_lesson_index", lessonController.changeLessonIndex);
+
 app.put("/lessons/:id", lessonController.updateLesson);
 
 app.delete("/lessons/:id", lessonController.deleteLesson);
