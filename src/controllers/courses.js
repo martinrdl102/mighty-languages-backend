@@ -88,15 +88,10 @@ exports.getCourse = async (req, res) => {
   try {
     let course = await courseModel.Course.findById(req.params.id);
     let userRating = 0;
-    let courseEnrollment = null;
     if (req.query.user_id !== "undefined") {
       userRating = await Rating.findOne({
         userId: req.query.user_id,
         courseId: course._id,
-      });
-      courseEnrollment = await CourseEnrollment.findOne({
-        course: req.params.id,
-        user: req.query.user_id,
       });
     }
     const ratings = await Rating.aggregate([
@@ -154,17 +149,6 @@ exports.deleteCourse = async (req, res) => {
     await lessonModel.Lesson.deleteMany({ course: req.params.id });
     await ratingModel.Rating.deleteMany({ courseId: req.params.id });
     return res.json(course);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-};
-
-exports.searchCoursebyName = async (req, res) => {
-  try {
-    const courses = await courseModel.Course.find({
-      title: { $regex: `/${req.query.title}/` },
-    });
-    return res.json(courses);
   } catch (err) {
     res.status(500).send(err.message);
   }
